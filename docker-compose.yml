@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq
+    restart: unless-stopped
+
+  redis:
+    image: redis
+    restart: unless-stopped
+
+  mongo:
+    image: mongo
+    restart: unless-stopped
+
+  worker:
+    image: python
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - rabbitmq
+      - mongo
+    volumes:
+      - ./worker:/opt/app
+      - ./data:/opt/app/data
+      - ./docker_entrypoint_worker.sh:/opt/docker_entrypoint_worker.sh
+    environment:
+      - NLB_QUEUE_BROKER=amqp://rabbitmq
+      - NLB_QUEUE_BACKEND=redis://redis
+      - NLB_DATA_STORE=mongodb://mongo
+    working_dir: /opt/
+    entrypoint: /opt/docker_entrypoint_worker.sh
+    command: ["celery", "-A", "nlbayes_tasks", "worker", "--concurrency=1", "--max-tasks-per-child=1", "--loglevel=info"]
+
+  dash:
+    image: python
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - rabbitmq
+      - mongo
+    ports:
+      - 8053:8050
+    volumes:
+      - ./dash:/opt/app
+      - ./data:/opt/app/data
+      - ./docker_entrypoint_dash.sh:/opt/docker_entrypoint_dash.sh
+    environment:
+      - NLB_QUEUE_BROKER=amqp://rabbitmq
+      - NLB_QUEUE_BACKEND=redis://redis
+      - NLB_DATA_STORE=mongodb://mongo
+    working_dir: /opt/app/
+    entrypoint: ["/opt/docker_entrypoint_dash.sh"]
+    command: ["gunicorn", "index:server", "-b", ":8050", "-w 12"]
+    # command: ["python", "index.py", "--host", "0.0.0.0", "--port", "8050", "--debug"]
+
