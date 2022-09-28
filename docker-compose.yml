@@ -51,6 +51,6 @@ services:
       - NLB_DATA_STORE=mongodb://mongo
     working_dir: /opt/app/
     entrypoint: ["/opt/docker_entrypoint_dash.sh"]
-    command: ["gunicorn", "index:server", "-b", ":8050", "-w 12"]
-    # command: ["python", "index.py", "--host", "0.0.0.0", "--port", "8050", "--debug"]
+    # command: ["gunicorn", "index:server", "-b", ":8050", "-w 12"]
+    command: ["python", "index.py", "--host", "0.0.0.0", "--port", "8050", "--debug"]
 
