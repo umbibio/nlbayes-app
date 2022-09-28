@@ -1,4 +1,5 @@
 from importlib import import_module
+import re
 
 from dash import dcc
 from dash import html
@@ -10,9 +11,19 @@ import apps
 import dash_bootstrap_components as dbc
 
 
+page_modules = [mod for mod in apps.__loader__.get_resource_reader().contents() if re.match('^p\d\d_', mod)]
+page_modules.sort()
+page_names = [re.sub('^p\d\d_', '', mod) for mod in page_modules]
+page_hrefs = page_names.copy()
+page_hrefs[0] = ''
+
 pages = [
-    {'title': mod.capitalize(), 'app': mod, 'href': f'{url_base_pathname}{mod}'}
-    for mod in apps.__loader__.get_resource_reader().contents() if not mod.startswith('__')
+    {
+        'title': name.capitalize(),
+        'app': module,
+        'href': f'{url_base_pathname}{href}',
+    }
+    for name, module, href in zip(page_names, page_modules, page_hrefs)
 ]
 
 for page in pages:
