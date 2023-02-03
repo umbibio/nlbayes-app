@@ -15,7 +15,7 @@ menu = [
         ] + [
             dbc.Row([
                 dbc.Label(label, html_for={'type': 'net-select', 'key': key}, width=4),
-                dbc.Col(dbc.Select({'type': 'net-select', 'key': key}), width=8), ])
+                dbc.Col(dbc.Select(id={'type': 'net-select', 'key': key}), width=8), ])
             for label, key in zip(['Organism', 'Net. Source', 'Net. Type', 'Network'], ['organism', 'nsource', 'ntype', 'name'])
         ],
         id='network-selection-container',
@@ -88,7 +88,7 @@ menu = [
     dbc.Label("Select Data Columns:"),
     *[dbc.Row([
         dbc.Label(label, html_for={'type': 'data-column-role', 'key': key}, width=4),
-        dbc.Col(dbc.Select({'type': 'data-column-role', 'key': key}, options=[{'label': 'Not Available', 'value': 'not-available'}], value='not-available'), width=8), ])
+        dbc.Col(dbc.Select(id={'type': 'data-column-role', 'key': key}, options=[{'label': 'Not Available', 'value': 'not-available'}], value='not-available'), width=8), ])
       for label, key in zip(['Gene ID', 'P-Value', 'Log2 FC'], ['gene', 'pval', 'logfc']) ],
     html.Br(),
 
