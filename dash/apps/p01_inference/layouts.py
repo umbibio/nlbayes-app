@@ -7,6 +7,12 @@ menu = [
     html.Br(),
     html.H3("Define Inputs"),
     html.Hr(),
+    html.Div([
+        html.H4("Network selection"),
+        dbc.Alert(html.Small("Use one of the predefined networks we make available, "
+            "or upload a custom network. "
+            "Use the switch below to toggle between these two options."), color="info")
+    ]),
     dbc.Switch('use-predefined-network', label='Use Predefined Network', value=True),
     
     html.Div(
@@ -61,6 +67,12 @@ menu = [
         style={'display': 'none'},
     ),
     html.Hr(),
+    html.Div([
+        html.H4("Data upload"),
+        dbc.Alert(html.Small(
+            "Use the form below to upload a csv, tsv or xlsx file with the differential expression to analyze. "
+            "Gene IDs must match those used in the loaded network."), color='info')
+    ]),
     html.Div([
         dbc.Label("Upload Experiment Data:", html_for='upload-data'),
         dcc.Upload(
