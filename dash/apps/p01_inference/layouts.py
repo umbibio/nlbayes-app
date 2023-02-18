@@ -20,9 +20,20 @@ menu = [
             dbc.Label("Select Network:"),
         ] + [
             dbc.Row([
-                dbc.Label(label, html_for={'type': 'net-select', 'key': key}, width=4),
+                dbc.Label(label, id=key + '-net-select-label', html_for={'type': 'net-select', 'key': key}, width=4),
+                dbc.Tooltip(info, target=key + '-net-select-label', placement='right'),
                 dbc.Col(dbc.Select(id={'type': 'net-select', 'key': key}), width=8), ])
-            for label, key in zip(['Organism', 'Net. Source', 'Net. Type', 'Network'], ['organism', 'nsource', 'ntype', 'name'])
+            for label, key, info in zip(
+                ['Organism', 'Net. Source', 'Net. Type', 'Net. Name'],
+                ['organism', 'nsource', 'ntype', 'name'],
+                [
+                    'Specify the organism or species for the network',
+                    'The source where the network is obtained from.',
+                    'Whether the network is built for a specific context (tissue specific), or not (tissue independent).',
+                    'The name that identifies the network.',
+                ])
+        ] + [
+            dbc.Alert(html.Small("Network selected uses NCBI ids."), color='info'),
         ],
         id='network-selection-container',
         style={'display': 'none'},
