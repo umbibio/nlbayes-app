@@ -13,7 +13,9 @@ from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash import dcc, html, dash_table
 from app import app
-from .helper_functions import get_networks, parse_contents, load_json_file
+
+from global_helper_functions import get_networks
+from .helper_functions import parse_contents, load_json_file
 from .helper_functions import submit_job, get_job_status
 
 
@@ -21,10 +23,10 @@ networks = get_networks()
 
 
 @app.callback(
-    Output({'type': 'net-select', 'key': 'organism'}, 'options'),
-    Output({'type': 'net-select', 'key': 'organism'}, 'value'),
+    Output({'type': 'net-select', 'key': 'net_source'}, 'options'),
+    Output({'type': 'net-select', 'key': 'net_source'}, 'value'),
     Input('use-predefined-network', 'value'),)
-def populate_network_organism_dropdown(use_predefined):
+def populate_network_net_source_dropdown(use_predefined):
 
     if ctx.triggered[0]['prop_id'] == 'use-predefined-network.value':
         raise PreventUpdate
@@ -35,25 +37,25 @@ def populate_network_organism_dropdown(use_predefined):
     else:
         options_lst = list(networks.keys())
         options_lst.sort()
-        options = [{'label': k, 'value': k} for k in options_lst]
-        value = 'homo_sapiens'
+        options = [{'label': ' '.join(map(str.capitalize, k.split('_'))), 'value': k} for k in options_lst]
+        value = 'gtex_chip'
 
     return options, value
 
 
 @app.callback(
-    Output({'type': 'net-select', 'key': 'nsource'}, 'options'),
-    Output({'type': 'net-select', 'key': 'nsource'}, 'value'),
-    Input({'type': 'net-select', 'key': 'organism'}, 'value'),)
-def populate_network_nsource_dropdown(organism):
-    if not organism:
+    Output({'type': 'net-select', 'key': 'net_organism'}, 'options'),
+    Output({'type': 'net-select', 'key': 'net_organism'}, 'value'),
+    Input({'type': 'net-select', 'key': 'net_source'}, 'value'),)
+def populate_network_net_organism_dropdown(net_source):
+    if not net_source:
         options = []
         value = None
     else:
-        options_lst = list(networks[organism].keys())
+        options_lst = list(networks[net_source].keys())
         options_lst.sort()
-        options = [{'label': k, 'value': k} for k in options_lst]
-        value = 'gtex_chip' if 'gtex_chip' in options_lst else (options[0]['value'] if options else None)
+        options = [{'label': ' '.join(map(str.capitalize, k.split('_'))), 'value': k} for k in options_lst]
+        value = 'homo_sapiens' if 'homo_sapiens' in options_lst else (options[0]['value'] if options else None)
 
     return options, value
 
@@ -61,16 +63,16 @@ def populate_network_nsource_dropdown(organism):
 @app.callback(
     Output({'type': 'net-select', 'key': 'ntype'}, 'options'),
     Output({'type': 'net-select', 'key': 'ntype'}, 'value'),
-    Input({'type': 'net-select', 'key': 'organism'}, 'value'),
-    Input({'type': 'net-select', 'key': 'nsource'}, 'value'),)
-def populate_network_ntype_dropdown(organism, nsource):
-    if not organism or not nsource:
+    Input({'type': 'net-select', 'key': 'net_source'}, 'value'),
+    Input({'type': 'net-select', 'key': 'net_organism'}, 'value'),)
+def populate_network_ntype_dropdown(net_source, net_organism):
+    if not net_source or not net_organism:
         options = []
         value = None
     else:
-        options_lst = list(networks[organism][nsource].keys())
+        options_lst = list(networks[net_source][net_organism].keys())
         options_lst.sort()
-        options = [{'label': k, 'value': k} for k in options_lst]
+        options = [{'label': ' '.join(map(str.capitalize, k.split('_'))), 'value': k} for k in options_lst]
         value = 'tissue_independent' if 'tissue_independent' in options_lst else (options[0]['value'] if options else None)
 
     return options, value
@@ -79,17 +81,17 @@ def populate_network_ntype_dropdown(organism, nsource):
 @app.callback(
     Output({'type': 'net-select', 'key': 'name'}, 'options'),
     Output({'type': 'net-select', 'key': 'name'}, 'value'),
-    State({'type': 'net-select', 'key': 'organism'}, 'value'),
-    State({'type': 'net-select', 'key': 'nsource'}, 'value'),
+    State({'type': 'net-select', 'key': 'net_source'}, 'value'),
+    State({'type': 'net-select', 'key': 'net_organism'}, 'value'),
     Input({'type': 'net-select', 'key': 'ntype'}, 'value'),)
-def populate_network_name_dropdown(organism, nsource, ntype):
-    if not ntype or not nsource or not organism:
+def populate_network_name_dropdown(net_source, net_organism, ntype):
+    if not ntype or not net_organism or not net_source:
         options = []
         value = None
     else:
-        options_lst = list(networks[organism][nsource][ntype].keys())
+        options_lst = list(networks[net_source][net_organism][ntype].keys())
         options_lst.sort()
-        options = [{'label': k.replace('.rels', ''), 'value': k} for k in options_lst]
+        options = [{'label': ' '.join(map(str.capitalize, k.replace('.rels', '').split('_'))), 'value': k} for k in options_lst]
         value = 'three_tissue.rels' if 'three_tissue.rels' in options_lst else (options[0]['value'] if options else None)
 
     return options, value
@@ -102,8 +104,8 @@ def populate_network_name_dropdown(organism, nsource, ntype):
 def update_network_selected(nids, netsel):
     ns = {i['key']:v for i, v in zip(nids, netsel)}
     if all([bool(v) for v in netsel]):
-        o, s, t, n = ns['organism'], ns['nsource'], ns['ntype'], ns['name']
-        network_file = networks[o][s][t][n]
+        s, o, t, n = ns['net_source'], ns['net_organism'], ns['ntype'], ns['name']
+        network_file = networks[s][o][t][n]
         with open(network_file, 'r') as file:
             return json.load(file)
 
@@ -395,7 +397,7 @@ def submit_inference_job(button_click, network, evidence):
     Output('inference-progress-timer', 'disabled'),
     Input('queue-task-info', 'data'),
     Input('inference-progress-timer', 'n_intervals'),
-    State({'type': 'net-select', 'key': 'organism'}, 'value'),
+    State({'type': 'net-select', 'key': 'net_organism'}, 'value'),
 )
 def update_job_status(info, refresh_trigger, organism):
     if info is None:

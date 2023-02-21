@@ -21,31 +21,12 @@ mongo_url = os.environ['NLB_DATA_STORE']
 worker = Celery('nlbayes_jobs', backend=backend, broker=broker)
 
 
-def get_networks():
-    networks = {}
-    for network_file in glob('data/networks/*/*/*/*.json'):
-        _, _, o, s, t, n = os.path.splitext(network_file)[0].split(os.sep)
-
-        if not o in networks.keys():
-            networks[o] = {}
-
-        if not s in networks[o].keys():
-            networks[o][s] = {}
-
-        if not t in networks[o][s].keys():
-            networks[o][s][t] = {}
-
-        networks[o][s][t][n] = network_file
-
-    return networks
-
-
 def parse_contents(contents:str, filename: str):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
     try:
-        if filename.endswith('.csv'):
+        if filename.lower().endswith('.csv'):
             content = decoded.decode('utf-8')
             if content.count(',') == 0:
                 # check if it is a tsv instead
@@ -56,7 +37,7 @@ def parse_contents(contents:str, filename: str):
             # Assume that the user uploaded a CSV file
             return pd.read_csv(io.StringIO(content), sep=sep)
 
-        elif filename.endswith('.tsv'):
+        elif filename.lower().endswith('.tsv'):
             content = decoded.decode('utf-8')
             if content.count('\t') == 0:
                 # check if it is a csv instead
@@ -67,11 +48,11 @@ def parse_contents(contents:str, filename: str):
             # Assume that the user uploaded a TSV file
             return pd.read_csv(io.StringIO(content), sep=sep)
 
-        elif filename.endswith('.xlsx') or filename.endswith('.xls'):
+        elif filename.lower().endswith('.xlsx') or filename.lower().endswith('.xls'):
             # Assume that the user uploaded an excel file
             return pd.read_excel(io.BytesIO(decoded))
 
-        elif filename.endswith('.json'):
+        elif filename.lower().endswith('.json'):
             return json.loads(decoded)
 
     except Exception as e:

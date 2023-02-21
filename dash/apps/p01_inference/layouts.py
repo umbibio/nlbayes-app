@@ -22,13 +22,13 @@ menu = [
             dbc.Row([
                 dbc.Label(label, id=key + '-net-select-label', html_for={'type': 'net-select', 'key': key}, width=4),
                 dbc.Tooltip(info, target=key + '-net-select-label', placement='right'),
-                dbc.Col(dbc.Select(id={'type': 'net-select', 'key': key}), width=8), ])
+                dbc.Col(dbc.Select(id={'type': 'net-select', 'key': key}), width=8), ], class_name='mb-2')
             for label, key, info in zip(
-                ['Organism', 'Net. Source', 'Net. Type', 'Net. Name'],
-                ['organism', 'nsource', 'ntype', 'name'],
+                ['Source', 'Organism', 'Type', 'Name'],
+                ['net_source', 'net_organism', 'ntype', 'name'],
                 [
+                    'The source where the network was obtained from.',
                     'Specify the organism or species for the network',
-                    'The source where the network is obtained from.',
                     'Whether the network is built for a specific context (tissue specific), or not (tissue independent).',
                     'The name that identifies the network.',
                 ])
@@ -82,7 +82,8 @@ menu = [
         html.H4("Data upload"),
         dbc.Alert(html.Small(
             "Use the form below to upload a csv, tsv or xlsx file with the differential expression to analyze. "
-            "Gene IDs must match those used in the loaded network."), color='info')
+            "Gene IDs must match those used in the loaded network. Fold change column is required and will be "
+            "converted into discrete values -1, 0, +1."), color='info')
     ]),
     html.Div([
         dbc.Label("Upload Experiment Data:", html_for='upload-data'),
