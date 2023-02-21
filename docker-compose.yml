@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   worker:
-    image: python
+    image: python:3.10
     restart: unless-stopped
     depends_on:
       - redis
@@ -33,17 +33,15 @@ services:
     command: ["celery", "-A", "nlbayes_tasks", "worker", "--concurrency=1", "--max-tasks-per-child=1", "--loglevel=info"]
 
   dash:
-    image: python
+    image: python:3.10
     restart: unless-stopped
     depends_on:
-      - redis
-      - rabbitmq
-      - mongo
+      - worker
     ports:
       - 8053:8050
     volumes:
       - ./dash:/opt/app
-      - ./data:/opt/app/data
+      - ./data:/opt/app/assets/data
       - ./docker_entrypoint_dash.sh:/opt/docker_entrypoint_dash.sh
     environment:
       - NLB_QUEUE_BROKER=amqp://rabbitmq
