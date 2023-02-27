@@ -67,11 +67,6 @@ def cite(key, full=False):
     if not full:
         return html.A(f"({first_author_familyname}, et al. {ref['year']})", href=ref['url'], target='blank')
 
-    full_journal_str = ref['journal']
-    if 'volume' in ref:
-        full_journal_str += ', Volume ' + ref['volume']
-    if 'number' in ref:
-        full_journal_str += ', Issue ' + ref['number']
 
     if 'doi' in ref:
         doi_url = 'https://doi.org/' + ref['doi']
@@ -81,11 +76,11 @@ def cite(key, full=False):
 
     published_str = "Published: " + months[ref['month']] + ' ' + ref['year']
     return html.Div([
-        html.A(ref['title'].strip('{}'), href=ref['url'], target='blank'),
-        html.Br(),
-        html.Span(authors_str),
-        html.Br(),
-        html.Span(full_journal_str),
+        html.Span('“' + ref['title'].strip('{}') + '”. '), html.Br(),
+        html.Span(authors_str + '. '), html.Br(),
+        html.I(ref['journal']),
+        ', Volume ' + ref['volume'] if 'volume' in ref else None,
+        ', Issue ' + ref['number'] if 'number' in ref else None,
         html.Br(),
         doi_url,
         html.Br(),
