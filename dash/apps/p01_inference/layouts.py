@@ -33,7 +33,7 @@ menu = [
                     'The name that identifies the network.',
                 ])
         ] + [
-            dbc.Alert(html.Small("Network selected uses NCBI ids."), color='info'),
+            dbc.Alert(html.Small("Selected network uses NCBI ids."), color='info'),
         ],
         id='network-selection-container',
         style={'display': 'none'},
@@ -112,7 +112,7 @@ menu = [
     dbc.Label("Select Data Columns:"),
     *[dbc.Row([
         dbc.Label(label, html_for={'type': 'data-column-role', 'key': key}, width=4),
-        dbc.Col(dbc.Select(id={'type': 'data-column-role', 'key': key}, options=[{'label': 'Not Available', 'value': 'not-available'}], value='not-available'), width=8), ])
+        dbc.Col(dbc.Select(id={'type': 'data-column-role', 'key': key}, options=[{'label': 'Not Available', 'value': 'not-available'}], value='not-available'), width=8), ], class_name='mb-2')
       for label, key in zip(['Gene ID', 'P-Value', 'Log2 FC'], ['gene', 'pval', 'logfc']) ],
     html.Br(),
 
@@ -123,10 +123,10 @@ menu = [
     html.Br(),
     dbc.Row([
         dbc.Label('P-Value Threshold:', html_for='pval-threshold', width=6),
-        dbc.Col(dbc.Input('pval-threshold', type='number', value='1e-3', min=0., max=1., step='any'), width=6), ]),
+        dbc.Col(dbc.Input('pval-threshold', type='number', value='1e-3', min=0., max=1., step='any'), width=6), ], class_name='mb-2'),
     dbc.Row([
         dbc.Label('log2FC Threshold:', html_for='logfc-threshold', width=6),
-        dbc.Col(dbc.Input('logfc-threshold', type='number', value='1', min=0., step='any'), width=6), ]),
+        dbc.Col(dbc.Input('logfc-threshold', type='number', value='1', min=0., step='any'), width=6), ], class_name='mb-2'),
     html.Br(),
 
     dbc.Row(dbc.Col(html.P(id='final-evidence-info')), class_name='mb-3'),
