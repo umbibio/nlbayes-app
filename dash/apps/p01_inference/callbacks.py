@@ -133,7 +133,7 @@ def update_network_upload(content, filename, date):
         # match of the list
         tst_collection = {
             'src': ['src', 'tf', 'factor'],
-            'trg': ['trg', 'gene'],
+            'trg': ['trg', 'target', 'gene'],
             'mor': ['mor', 'type', 'sign', 'reg', 'sgn'],
         }
 
@@ -320,7 +320,7 @@ def process_input_data(data, cids, colnames, network, logfc_threshold, p_val_thr
 
     # determine which genes were differentially expressed according to 
     # logfc and pvalue thresholds
-    logfc_filter = lambda x: 1 if x > logfc_threshold else (-1 if x < -logfc_threshold else 0)
+    logfc_filter = lambda x: 1 if x >= logfc_threshold else (-1 if x <= -logfc_threshold else 0)
     df['DE value'] = df['Log2FC'].apply(logfc_filter)
 
     if 'pval' in t.keys():
@@ -432,7 +432,7 @@ def update_job_status(info, refresh_trigger, organism):
 
     if posterior_hash is not None:
         posterior = load_json_file(posterior_hash)
-        annotation_filepath = f"data/annotations/{organism}/ncbi/symbol.json"
+        annotation_filepath = os.path.join("assets", "data", "annotations", organism, "ncbi", "symbol.json")
         if os.path.exists(annotation_filepath):
             with open(annotation_filepath) as file:
                 annotation = json.load(file)
