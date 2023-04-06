@@ -146,6 +146,8 @@ body = [
     dcc.Store('data-columns-available'),
     dcc.Store('selected-evidence-final', data={}),
 
+    dcc.Store('output-data'),
+
     dbc.Row(dbc.Col(
         dbc.Card([
             dbc.CardBody(dbc.Row([
@@ -172,10 +174,18 @@ body = [
     ), class_name="mb-4 mt-4"),
     dbc.Row(dbc.Col(
         dbc.Card([
-            dbc.CardBody(dbc.Row([
-                dbc.Col(html.H5("Active TF Inference", className='card-title'), class_name='mt-0'),
-                dbc.Col(html.Div(id='inference-info'), width=12),
-            ])),
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col(html.H5("Active TF Inference", className='card-title'), class_name='mt-0'),
+                    dbc.Col(html.Div(id='inference-info'), width=12),
+                ]),
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Download(id='inference-result-download'),
+                        dbc.Button('Download TSV', id='inference-result-download-button', style={'display': 'none'}),
+                    ])
+                ])
+            ]),
         ],),
     ), class_name="mb-4 mt-4"),
 ]

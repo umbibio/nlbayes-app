@@ -397,6 +397,8 @@ def submit_inference_job(button_click, network, evidence):
 @app.callback(
     Output('inference-info', 'children'),
     Output('inference-progress-timer', 'disabled'),
+    Output('output-data', 'data'),
+    Output('inference-result-download-button', 'style'),
     Input('queue-task-info', 'data'),
     Input('inference-progress-timer', 'n_intervals'),
     State({'type': 'net-select', 'key': 'net_organism'}, 'value'),
@@ -452,8 +454,29 @@ def update_job_status(info, refresh_trigger, organism):
         dt_table = dash_table.DataTable(dt_data, dt_columns, page_size=25)
         children.append(dt_table)
         disable_interval = True
+        download_button_style = {'display': 'block'}
+    else:
+        download_button_style = {'display': 'none'}
+        dt_data = None
 
-    return html.Div(children), disable_interval
+    return html.Div(children), disable_interval, dt_data, download_button_style
+
+
+@app.callback(
+        Output('inference-result-download', 'data'),
+        Input('inference-result-download-button', 'n_clicks'),
+        State('output-data', 'data'),
+)
+def download_output_data(_, dt_data):
+    if ctx.triggered[0]['prop_id'] != 'inference-result-download-button.n_clicks':
+        raise PreventUpdate
+
+    if not dt_data:
+        raise PreventUpdate
+    
+    df = pd.DataFrame(dt_data)
+
+    return dict(content=df.to_csv(sep='\t', index=False), filename="inference_result.tsv")
 
 
 app.clientside_callback(
