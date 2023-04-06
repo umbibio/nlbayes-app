@@ -345,6 +345,8 @@ def process_input_data(data, cids, colnames, network, logfc_threshold, p_val_thr
     # eliminate duplicated genes, keeping the most significant result
     # according to pvalue (or abs(log2fc))
     df = df.drop_duplicates('Gene').dropna()
+    if df.Gene.dtype == float:
+        df['Gene'] = df['Gene'].astype(int)
     df['Gene'] = df['Gene'].astype(str)
 
     # keep only genes available in the network
