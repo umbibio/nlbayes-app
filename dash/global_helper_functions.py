@@ -56,8 +56,13 @@ def cite(key, full=False):
     ref = references_dict[key]
     authors = []
     for i, a in enumerate(ref['author'].split(' and ')):
-        assert ', ' in a
-        familyname, givenname = a.split(', ')
+        if ', ' in a:
+            familyname, givenname = a.split(', ')
+        else:
+            full_name = a.split(' ')
+            familyname = full_name[-1]
+            givenname = ' '.join(full_name[:-1])
+
         a = givenname + ' ' + familyname
         authors.append(a)
         if i == 0:
@@ -74,7 +79,13 @@ def cite(key, full=False):
     else:
         doi_url = None
 
-    published_str = "Published: " + months[ref['month']] + ' ' + ref['year']
+    if ref['journal'].lower() in ['arxiv', 'biorxiv']:
+        published_str = "Preprint:"
+    else:
+        published_str = "Published:"
+    if 'month' in ref:
+        published_str += ' ' + months[ref['month']]
+    published_str += ' ' + ref['year']
     return html.Div([
         html.Span('“' + ref['title'].strip('{}') + '”. '), html.Br(),
         html.Span(authors_str + '. '), html.Br(),
