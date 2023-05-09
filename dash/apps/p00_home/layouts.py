@@ -14,7 +14,7 @@ target genes.
 
 NLBayes is available for R and Python as instalable packages
 [nlbayes-python](https://github.com/umbibio/nlbayes-python),
-[nlbayes-rcran](https://github.com/umbibio/nlbayes-rcran).
+[nlbayes-r](https://github.com/umbibio/nlbayes-r).
 
 This web portal provides a [simple interface](inference) to use the corresponding inference
 algorithm and for [obtaining data](data) relevant to the method.
@@ -43,12 +43,13 @@ body = [
     dbc.Row([
         dbc.Col(dbc.Card([
             dbc.CardHeader(html.H4("Citation")),
-            dbc.CardBody(dcc.Markdown('''
-''')),
+            dbc.CardBody(cite('Arriojas2023NLBayes', full=True)),
         ],),),
         dbc.Col(dbc.Card([
             dbc.CardHeader(html.H4("Contact")),
-            dbc.CardBody(dcc.Markdown('''
+            dbc.CardBody(dcc.Markdown('''For questions or comments please contact:
+
+ArriojasMaldonado001 at umb dot edu
 ''')),
         ],),),
     ]),
